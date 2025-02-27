@@ -10,9 +10,10 @@ import java.util.Scanner;
  *
  * Uses an ArrayList to store tasks and Scanner for user input.
  */
-public class ToDoListApp {
+public class   ToDoListApp {
     // Stores the list of tasks
     private static ArrayList<String> tasks = new ArrayList<>();
+    private static ArrayList<String> completedTasks = new ArrayList<>();    //For viewing completed task
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in); // Scanner for user input
@@ -23,9 +24,10 @@ public class ToDoListApp {
             // Display menu options
             System.out.println("\n--- To-Do List ---");
             System.out.println("1. Add Task");
-            System.out.println("2. View Tasks");
-            System.out.println("3. Remove Task");
-            System.out.println("4. Exit");
+            System.out.println("2. View Ongoing Tasks");
+            System.out.println("3. View Completed Tasks");
+            System.out.println("4. Remove Task");
+            System.out.println("5. Exit");
             System.out.print("Enter choice: ");
 
             // Read user input (menu choice)
@@ -35,15 +37,49 @@ public class ToDoListApp {
             // Handle user choice using a switch statement
             switch (choice) {
                 case 1 -> addTask(scanner); // Call method to add a task
-                case 2 -> viewTasks(); // Call method to display tasks
-                case 3 -> removeTask(scanner); // Call method to remove a task
-                case 4 -> System.out.println("Exiting..."); // Exit message
+                case 2 -> viewOngoingTasks(scanner); // Call method to display tasks
+                case 3 -> viewCompletedTasks(); // Call method to remove a task
+                case 4 -> removeTask(scanner);
+                case 5 -> System.out.println("Exiting..."); // Exit message
                 default -> System.out.println("Invalid choice. Try again."); // Handle invalid input
             }
-        } while (choice != 4); // Loop until user selects option 4 (Exit)
+        } while (choice != 5); // Loop until user selects option 4 (Exit)
 
         scanner.close(); // Close scanner to prevent memory leaks
     }
+
+    /**
+     * Method to complete task. It adds the task entered to the completedTasks array list, and then
+     * deletes it from the tasks arraylist.
+     * @param index used to access the task given
+     *
+     * @author James Foster
+     */
+    private static void completeTask(int index) {
+        if (index > 0 && index <= tasks.size()) {
+            completedTasks.add(tasks.get(index - 1));
+            tasks.remove(index - 1); // Remove task (index is 1-based, ArrayList is 0-based)
+        }
+    }
+
+    /**
+     * Method to view the list of completed task. If there aren't any, it
+     * tells the user and returns back to the main menu
+     *
+     * @author James Foster
+     */
+    public static void viewCompletedTasks() {
+        if (completedTasks.isEmpty()) { // Check if the list is empty
+            System.out.println("You haven't completed any Tasks! GET TO WORK!!!");
+        } else {
+            System.out.println("\nYour Completed Tasks:");
+            // Loop through the list and display each task with a number
+            for (int i = 0; i < completedTasks.size(); i++) {
+                System.out.println((i + 1) + ". " + completedTasks.get(i));
+            }
+        }
+    }
+
 
     /**
      * Method to add a new task to the list.
@@ -59,14 +95,25 @@ public class ToDoListApp {
     /**
      * Method to display all tasks in the list.
      */
-    private static void viewTasks() {
+    private static void viewOngoingTasks(Scanner scanner) {
         if (tasks.isEmpty()) { // Check if the list is empty
-            System.out.println("No tasks available.");
+            System.out.println("No tasks available. Try adding a task first.");
         } else {
             System.out.println("\nYour Tasks:");
             // Loop through the list and display each task with a number
             for (int i = 0; i < tasks.size(); i++) {
                 System.out.println((i + 1) + ". " + tasks.get(i));
+            }
+
+            System.out.println("Would you like to complete a task? (Y/N)");
+            String choice = scanner.nextLine();
+            if (choice.equalsIgnoreCase("Y")) {
+                System.out.println("Which task would you like to complete?");
+                int response = scanner.nextInt();
+                completeTask(response);//complete the task
+                System.out.println("Task completed!");
+            }else if (choice.equalsIgnoreCase("N")){
+                //will return back to main method...
             }
         }
     }
@@ -76,7 +123,11 @@ public class ToDoListApp {
      * @param scanner Scanner object for user input.
      */
     private static void removeTask(Scanner scanner) {
-        viewTasks(); // Show current tasks before asking for input
+        //List out the tasks...
+        System.out.println("\nYour Tasks:");
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + ". " + tasks.get(i));
+        }
         if (tasks.isEmpty()) return; // If no tasks, exit method
 
         System.out.print("Enter task number to remove: ");
